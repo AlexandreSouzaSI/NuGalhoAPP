@@ -10,6 +10,9 @@ Nu Galho app.
 - [ ] Deve ser possível Cadastrar funcionarios;
 - [ ] Deve ser possivel Editar funcionarios;
 - [ ] Deve ser possivel Remover funcionarios;
+- [ ] Deve ser possivel Cadastrar uma empresa;
+- [ ] Deve ser possivel Remover uma empresa;
+- [ ] Deve ser possivel editar uma empresa;
 
 ## RNs (Regras de négocio)
 
