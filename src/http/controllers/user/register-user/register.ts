@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from "zod"
-import { RegisterUseCase } from '@/use-cases/register'
-import { PrismaUsersRepository } from '@/repositories/prisma-users-repository'
+import { makeRegisterUseCase } from '@/use-cases/factories/make-register-user-case'
+import { UserEmailOrCpfAlreadyExistsError } from '@/use-cases/errors/user-emailOrCpf-already-exists-error'
 
 
 export async function register(request: FastifyRequest, reply: FastifyReply) {
@@ -14,10 +14,11 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
         admissao: z.date().optional(),
         cargo: z.string().optional(),
         salario: z.number().optional(),
-        cpf: z.string().optional(),
+        cpf: z.string(),
         nascimento: z.date().optional(),
         pix: z.string().optional(),
-        contratado: z.string().optional()
+        contratado: z.string().optional(),
+        enterprise_id: z.string().optional()
     })
     
     const { 
@@ -31,13 +32,13 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
         cpf,
         nascimento,
         pix,
-        contratado
+        contratado,
+        enterprise_id
     } = registerBodySchema.parse(request.body)
 
     try {
-        const prismaUsersRepository = new PrismaUsersRepository()
-        const registerUseCase = new RegisterUseCase(prismaUsersRepository)
-        
+        const registerUseCase = makeRegisterUseCase()
+
         await registerUseCase.execute({
             name,
             email,
@@ -49,10 +50,17 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
             cpf,
             nascimento,
             pix,
-            contratado
+            contratado,
+            enterprise_id
         })
     } catch (error) {
-        return reply.status(409).send()
+        if (error instanceof UserEmailOrCpfAlreadyExistsError){
+            return reply.status(409).send({
+                message: error.message
+            })
+        }
+        
+        throw error
     }
 
     return reply.status(201).send()

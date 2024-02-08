@@ -22,12 +22,11 @@ model User {
   demissao      DateTime?
   cargo         String?
   salario       Decimal?
-  cpf           String?
+  cpf           String?   @unique
   nascimento    DateTime?
   pix           String?
   contratado    String?
-
-  Enterprise Enterprise[]
+  enterprise_id String?
 
   @@map("users")
 }
@@ -37,9 +36,6 @@ model Enterprise {
   name       String
   created_at DateTime @default(now())
   active     Boolean  @default(true)
-
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
 
   @@map("enterprise")
 }
